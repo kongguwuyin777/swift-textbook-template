@@ -158,7 +158,20 @@ struct SongRow: View {
 ### データモデル（Codable構造体）
 
 ```swift
-// 該当部分のコードを抜粋して貼る
+struct SearchResponse: Codable {
+    let results: [Song]
+}
+
+struct Song: Codable, Identifiable {
+    let trackId: Int
+    let trackName: String
+    let artistName: String
+    let artworkUrl100: String
+    let previewUrl: String?
+
+    var id: Int { trackId }
+}
+
 ```
 
 **何をしているか：**
