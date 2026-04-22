@@ -175,16 +175,11 @@ struct Song: Codable, Identifiable {
 ```
 
 **何をしているか：**
-APIから取得したJSONデータをデコードして、アプリ内で扱いやすいデータ構造（SongやSearchResponse）として表現している。
-また、Identifiableによりリスト表示で各要素を識別できるようにしている。
-
+APIのJSONデータをモデル化している  
 **なぜこう書くのか：**
-Codableを使うことでJSONとの変換を簡単に行えるため。
-また、Identifiableを使うことでSwiftUIのListで一意に識別できるため、この書き方が適している。
-
+Codableで変換を簡単にし、Identifiableで識別するため  
 **もしこう書かなかったら：**
-CodableがないとJSONのデコードを自分で実装する必要があり、処理が複雑になる。
-また、IdentifiableがないとList表示時にエラーが発生したり、正しく表示されない可能性がある。
+ないとデコードが複雑になり、UI表示に問題が出る
 
 ---
 
