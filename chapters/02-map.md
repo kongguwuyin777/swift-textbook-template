@@ -321,29 +321,80 @@ cameraPositionを設定しない場合、地図の初期位置が分かりにく
 ### マーカーの表示
 
 ```swift
-// 該当部分のコードを抜粋して貼る
+Map(position: $cameraPosition) {
+    ForEach(filteredLandmarks) { landmark in
+        Marker(
+            landmark.name,
+            systemImage: landmark.category.iconName,
+            coordinate: landmark.coordinate
+        )
+        .tint(landmark.category.color)
+    }
+}
 ```
 
 **何をしているか：**
-
+この部分では、地図上に観光スポットのマーカーを表示している。
+ForEachを使って観光スポットのデータを繰り返し処理し、それぞれの場所にMarkerを配置している。
+また、カテゴリごとに異なるアイコンや色を設定している。
 **なぜこう書くのか：**
-
+ForEachを使うことで、複数の観光スポットを効率よく地図上へ表示できる。
+Markerを使うことで、位置情報を視覚的に分かりやすく表示できる。
+さらに、カテゴリごとにアイコンや色を変更することで、ユーザーがスポットの種類を直感的に判断しやすくなる。
 **もしこう書かなかったら：**
-
+ForEachを使わない場合、マーカーを一つずつ手動で書く必要があり、データ数が増えると管理が難しくなる。
+また、Markerを使わなければ、観光スポットの位置を地図上に表示できない。
+さらに、色やアイコンを設定しない場合、すべて同じ見た目になり、スポットの種類が分かりにくくなる。
 ---
 
 ### フィルター機能
 
 ```swift
-// 該当部分のコードを抜粋して貼る
+@State private var selectedCategories: Set<Landmark.Category> = Set(Landmark.Category.allCases)
+
+var filteredLandmarks: [Landmark] {
+    Landmark.sampleData.filter { selectedCategories.contains($0.category) }
+}
+
+struct CategoryFilter: View {
+    @Binding var selectedCategories: Set<Landmark.Category>
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(Landmark.Category.allCases, id: \.self) { category in
+                Button {
+                    if selectedCategories.contains(category) {
+                        selectedCategories.remove(category)
+                    } else {
+                        selectedCategories.insert(category)
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: category.iconName)
+                        Text(category.rawValue)
+                    }
+                    .font(.caption)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                }
+            }
+        }
+    }
+}
 ```
 
 **何をしているか：**
-
+この部分では、観光スポットをカテゴリごとに絞り込むフィルター機能を実装している。
+selectedCategoriesで現在選択されているカテゴリを管理し、filteredLandmarksで選択されたカテゴリのみを表示している。
+また、Buttonを押すことでカテゴリの追加・削除を切り替えられるようになっている。
 **なぜこう書くのか：**
-
+Setを使うことで、カテゴリの重複を防ぎながら効率よく管理できる。
+filterを使うことで、条件に一致する観光スポットだけを簡単に抽出できる。
+さらに、カテゴリごとにボタンを作成することで、ユーザーが表示内容を自由に切り替えられるようになる。
 **もしこう書かなかったら：**
-
+フィルター機能がない場合、すべての観光スポットが常に表示され、地図が見づらくなる可能性がある。
+また、selectedCategoriesを管理しないと、どのカテゴリが選択されているか判断できなくなる。
+さらに、filterを使わなかった場合、表示データを手動で管理する必要があり、コードが複雑になってしまう。
 ---
 
 （必要に応じてセクションを増やす）
