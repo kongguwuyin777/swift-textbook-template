@@ -229,32 +229,93 @@ struct LandmarkCard: View {
 ### データモデル（ランドマーク構造体）
 
 ```swift
-// 該当部分のコードを抜粋して貼る
+// MARK: - データモデル
+
+struct Landmark: Identifiable {
+    let id = UUID()
+    let name: String
+    let description: String
+    let coordinate: CLLocationCoordinate2D
+    let category: Category
+
+    enum Category: String, CaseIterable {
+        case temple = "寺社"
+        case tower = "タワー"
+        case park = "公園"
+
+        var iconName: String {
+            switch self {
+            case .temple: return "building.columns"
+            case .tower: return "antenna.radiowaves.left.and.right"
+            case .park: return "leaf"
+            }
+        }
+
+        var color: Color {
+            switch self {
+            case .temple: return .red
+            case .tower: return .blue
+            case .park: return .green
+            }
+        }
+    }
+}
 ```
 
 **何をしているか：**
-（この部分が果たしている役割を説明する）
+この部分では、地図上に表示する観光スポットのデータを定義している。
+Landmark構造体には、スポット名、説明、位置情報、カテゴリなどが保存されている。
+また、Categoryという列挙型を使って、「寺社」「タワー」「公園」の種類を管理している。
 
 **なぜこう書くのか：**
-（別の書き方ではなく、この書き方が選ばれている理由を説明する）
+LandmarkをIdentifiableにすることで、SwiftUIのListやMap上で各データを区別しやすくなる。
+また、カテゴリごとにアイコンや色を設定することで、地図上で視覚的に分かりやすく表示できる。
+enumを使うことで、カテゴリの種類を安全かつ整理された形で管理できる。
 
 **もしこう書かなかったら：**
-（この部分を省略したり変えたりすると何が起きるか。実際に試した結果があればここに書く）
+Identifiableがない場合、SwiftUIが各データを正しく識別できず、ForEachなどで扱いにくくなる。
+また、カテゴリを文字列だけで管理すると、タイプミスや不正な値が発生しやすくなる。
+さらに、色やアイコンをカテゴリごとに分けていないと、地図上でスポットの種類を判別しにくくなる。
 
 ---
 
 ### 地図の表示とカメラ制御
 
 ```swift
-// 該当部分のコードを抜粋して貼る
+@State private var cameraPosition: MapCameraPosition = .region(
+    MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 35.6812, longitude: 139.7671),
+        span: MKCoordinateSpan(latitudeDelta: 0.08, longitudeDelta: 0.08)
+    )
+)
+
+var body: some View {
+    Map(position: $cameraPosition) {
+        ForEach(filteredLandmarks) { landmark in
+            Marker(
+                landmark.name,
+                systemImage: landmark.category.iconName,
+                coordinate: landmark.coordinate
+            )
+            .tint(landmark.category.color)
+        }
+    }
+    .mapStyle(.standard(elevation: .realistic))
+}
 ```
 
 **何をしているか：**
-
+この部分では、MapKitを使って地図を表示し、観光スポットをマーカーとして地図上に配置している。
+また、cameraPositionを使って、最初に表示する地図の中心位置や拡大範囲を設定している。
+ForEachによって、filteredLandmarksのデータを繰り返し表示し、それぞれのスポットをマーカーとして表示している。
 **なぜこう書くのか：**
-
+Map(position:)を使うことで、地図の表示位置やズーム状態をSwiftUI側で管理できる。
+また、Markerを使うことで、観光スポットを分かりやすく地図上へ表示できる。
+カテゴリごとにアイコンや色を変えることで、ユーザーがスポットの種類を直感的に理解しやすくなる。
 **もしこう書かなかったら：**
-
+cameraPositionを設定しない場合、地図の初期位置が分かりにくくなる可能性がある。
+また、Markerを使わないと、地図上に観光スポットを表示できない。
+さらに、カテゴリごとに色やアイコンを分けなかった場合、どのスポットが寺社・タワー・公園なのか判別しにくくなる。
 ---
 
 ### マーカーの表示
