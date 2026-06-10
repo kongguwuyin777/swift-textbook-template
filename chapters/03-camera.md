@@ -269,17 +269,36 @@ struct ContentView: View {
 ### PhotosPickerによる写真選択
 
 ```swift
-// 該当部分のコードを抜粋して貼る
+PhotosPicker(selection: $selectedItem, matching: .images) {
+Label("写真を選ぶ", systemImage: "photo")
+}
+.buttonStyle(.bordered)
+
+.onChange(of: selectedItem) { _, newItem in
+Task {
+await loadOriginalImage(from: newItem)
+}
+}
+
 ```
 
 **何をしているか：**
-（この部分が果たしている役割を説明する）
+
+PhotosPickerを使用してフォトライブラリから写真を選択する機能を実装している。
+写真が選択されると、onChangeが検知し、loadOriginalImage()を呼び出して画像を読み込み、画面に表示する。
+
 
 **なぜこう書くのか：**
-（別の書き方ではなく、この書き方が選ばれている理由を説明する）
+
+PhotosPickerはSwiftUIで写真選択を簡単に実装できるため使用している。
+また、onChangeを利用することで、ユーザーが新しい写真を選択したタイミングで自動的に画像を読み込むことができる。
+
 
 **もしこう書かなかったら：**
-（この部分を省略したり変えたりすると何が起きるか。実際に試した結果があればここに書く）
+
+PhotosPickerを使用しなければ、ユーザーは写真を選択できなくなる。
+また、onChangeがなければ写真を選択しても画像の読み込み処理が実行されず、画面に表示されない。
+
 
 ---
 
