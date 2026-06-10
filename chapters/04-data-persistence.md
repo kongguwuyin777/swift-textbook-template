@@ -303,28 +303,57 @@ class Memo {
 ### データの追加・削除（modelContext）
 
 ```swift
-// 該当部分のコードを抜粋して貼る
+@Environment(\.modelContext) private var modelContext
+
+let memo = Memo(title: title, content: content)
+modelContext.insert(memo)
+
+func deleteMemos(at offsets: IndexSet) {
+    for index in offsets {
+        let memo = displayedMemos[index]
+        modelContext.delete(memo)
+    }
+}
 ```
 
 **何をしているか：**
 
+modelContextを使ってSwiftDataのデータを追加・削除している。
+新しいメモを保存するときはinsert()を使い、不要なメモを削除するときはdelete()を使う。
+
 **なぜこう書くのか：**
 
+SwiftDataではmodelContextがデータベースとの窓口となるためである。
+データの追加や削除を簡単に行うことができ、画面の表示も自動的に更新される。
+
 **もしこう書かなかったら：**
+
+modelContextを使用しない場合、メモを保存したり削除したりすることができない。
+そのため、アプリを再起動した後にデータが残らなくなる。
 
 ---
 
 ### @Queryによるデータ取得
 
 ```swift
-// 該当部分のコードを抜粋して貼る
+@Query(sort: \Memo.createdAt, order: .reverse)
+private var memos: [Memo]
 ```
 
 **何をしているか：**
 
+SwiftDataに保存されているMemoデータを取得している。
+また、createdAtを基準に新しいメモが上に表示されるよう並び替えている。
+
 **なぜこう書くのか：**
 
+@Queryを使うことで保存されているデータを自動的に取得できるためである。
+データが追加・削除・更新された場合も、画面が自動的に更新される。
+
 **もしこう書かなかったら：**
+
+保存されているメモを取得できなくなり、一覧に表示できない。
+また、手動でデータを読み込む処理を書く必要があり、コードが複雑になる。
 
 ---
 
