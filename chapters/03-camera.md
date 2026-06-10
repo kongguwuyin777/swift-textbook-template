@@ -168,8 +168,7 @@ struct CameraView: UIViewControllerRepresentable {
 
 **このアプリは何をするものか：**
 
-このアプリは、選択した写真にフィルターをかけて楽しむアプリである。
-セピアやモノクロなどの効果を適用し、加工した写真を保存することができる。
+
 
 
 ## コードの詳細解説
@@ -177,22 +176,31 @@ struct CameraView: UIViewControllerRepresentable {
 ### PhotosPickerによる写真選択
 
 ```swift
+PhotosPicker(selection: $selectedItem, matching: .images) {
+    Label("ライブラリ", systemImage: "photo.on.rectangle")
+}
+.buttonStyle(.bordered)
 
+.onChange(of: selectedItem) { _, newItem in
+    Task {
+        await loadImage(from: newItem)
+    }
+}
 
 ```
 
 **何をしているか：**
 
-
+PhotosPickerを使ってフォトライブラリから写真を選択し、選択された画像を画面に表示している。
 
 **なぜこう書くのか：**
 
-
+PhotosPickerはSwiftUIで簡単にフォトライブラリへアクセスできるため使用している。また、ユーザーが写真を選択したタイミングで自動的に画像を読み込むことができる。
 
 
 **もしこう書かなかったら：**
 
-
+ユーザーがフォトライブラリから写真を選択できなくなる。また、写真を選択しても画像が読み込まれず、画面に表示されない。
 
 ---
 
