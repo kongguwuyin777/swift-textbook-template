@@ -387,11 +387,11 @@ AppStorageを利用してユーザー設定を保存している。
 
 | 項目 | 説明 | 使用例 |
 |------|------|--------|
-| 例：`@Model` | SwiftDataでオブジェクトを永続化するためのマクロ | `@Model final class Memo { ... }` |
-| 例：`@Query` | データベースからデータを取得し、変更を自動で反映するプロパティラッパー | `@Query var memos: [Memo]` |
-| | | |
-| | | |
-| | | |
+| @Model       | SwiftDataでデータモデルを定義するためのマクロ            | `@Model class Memo { ... }`                                                |
+| @Query       | SwiftDataからデータを取得し、自動で画面に反映するプロパティラッパー | `@Query(sort: \Memo.createdAt, order: .reverse) private var memos: [Memo]` |
+| @AppStorage  | ユーザー設定を端末に保存するためのプロパティラッパー             | `@AppStorage("userName") private var userName: String = ""`                |
+| modelContext | SwiftDataのデータを追加・削除するためのコンテキスト         | `modelContext.insert(memo)`                                                |
+| @Bindable    | SwiftDataのデータを画面と双方向に連携するための属性         | `@Bindable var memo: Memo`                                                 |
 
 ## 自分の実験メモ
 
