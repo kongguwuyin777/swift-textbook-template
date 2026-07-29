@@ -451,6 +451,54 @@ try? await Task.sleep(
 
 この実験から、`await`は現在の非同期処理を一時的に待たせますが、アプリ全体を止めるものではないと分かりました。
 
+
+## 6. SwiftとAndroidの非同期処理の違い
+
+Swiftでは、`Task`、`async`、`await`を使います。
+
+```swift
+Task {
+    await loadImage()
+}
+
+func loadImage() async {
+    // 写真を読み込む
+}
+```
+
+AndroidのKotlinでは、`launch`、`suspend fun`、`withContext`を使います。
+
+```kotlin
+scope.launch {
+    loadImage()
+}
+
+suspend fun loadImage() {
+    withContext(Dispatchers.IO) {
+        // 写真を読み込む
+    }
+}
+```
+
+### 主な違い
+
+| Swift | Android（Kotlin） | 役割 |
+|---|---|---|
+| `Task` | `launch` | 非同期処理を始める |
+| `async` | `suspend fun` | 非同期関数を定義する |
+| `await` | 通常は書かない | 非同期処理の完了を待つ |
+| ― | `Dispatchers.IO` | 写真やファイルの読み込みを行う |
+
+Swiftの`Task`とKotlinの`launch`は、非同期処理を始めるために使います。
+
+Swiftの`async`に近いものは、Kotlinの`suspend fun`です。どちらも、時間がかかる処理を待つことができる関数を表します。
+
+Swiftでは、非同期関数を呼ぶときに`await`を書きます。Kotlinでは、`suspend`関数を呼ぶときに、通常は`await`を書きません。
+
+また、Androidでは、写真やファイルを読み込む処理に`Dispatchers.IO`を使うことがあります。
+
+書き方は少し違いますが、どちらもアプリの画面を止めずに、時間がかかる処理を行うために使います。
+
 ## 最後の30秒：まとめ
 
 最後にまとめます。
