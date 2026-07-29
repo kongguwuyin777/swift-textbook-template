@@ -378,8 +378,11 @@ UIImagePickerControllerはUIKitのDelegate方式で動作するため、SwiftUI�
 - loadImage関数
 - loadTransferableとawait
 - 自分の実験
+
+---
+
 ## 5分の流れ
-***最初の30秒：テーマの紹介
+**最初の30秒：テーマの紹介**
 みなさん、こんにちは。
 私の発表テーマは、写真の読み込みで使う非同期処理です。
 このアプリでは、フォトライブラリから写真を選んで画面に表示します。写真の読み込みには時間がかかる場合があるため、Task、async、awaitを使っています。
@@ -398,7 +401,8 @@ UIImagePickerControllerはUIKitのDelegate方式で動作するため、SwiftUI�
 onChangeは、その変化を確認します。
 Taskは、非同期処理を始めるために使います。Taskの中では、awaitを使って非同期関数を呼ぶことができます。
 3.asyncの役割
-func loadImage(from item: PhotosPickerItem?) async
+```func loadImage(from item: PhotosPickerItem?) async
+```
 asyncは、この関数が非同期関数であることを表します。
 非同期関数では、時間がかかる処理の結果を待つことができます。
 4.awaitの役割
@@ -407,7 +411,7 @@ asyncは、この関数が非同期関数であることを表します。
 loadTransferableは、選んだ写真をData型として読み込みます。
 awaitは、写真の読み込みが終わるまで待つために使います。
 読み込みが終わったら、DataをUIImageに変えて、画面に表示します。
-***最後の30秒：まとめ
+**最後の30秒：まとめ**
 最後にまとめます。
 Taskは、非同期処理を始めるために使います。
 asyncは、その関数が非同期関数であることを表します。
