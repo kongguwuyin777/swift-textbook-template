@@ -381,41 +381,89 @@ UIImagePickerControllerはUIKitのDelegate方式で動作するため、SwiftUI�
 
 ---
 
-## 5分の流れ
-**最初の30秒：テーマの紹介**
+# 5分の流れ
+
+## 最初の30秒：テーマの紹介
+
 みなさん、こんにちは。
+
 私の発表テーマは、写真の読み込みで使う非同期処理です。
-このアプリでは、フォトライブラリから写真を選んで画面に表示します。写真の読み込みには時間がかかる場合があるため、Task、async、awaitを使っています。
-1.アプリの動作
+
+このアプリでは、フォトライブラリから写真を選んで画面に表示します。写真の読み込みには時間がかかる場合があるため、`Task`、`async`、`await`を使っています。
+
+## 1. アプリの動作
+
 このアプリでは、「ライブラリ」ボタンを押して写真を選びます。
+
 写真を選ぶと、その写真が画面に表示されます。
+
 写真を読み込む部分で、非同期処理が使われています。
-2.Taskの役割
-```.onChange(of: selectedItem) { _, newItem in
+
+## 2. `Task`の役割
+
+```swift
+.onChange(of: selectedItem) { _, newItem in
     Task {
         await loadImage(from: newItem)
     }
 }
 ```
-写真を選ぶと、selectedItemの値が変わります。
-onChangeは、その変化を確認します。
-Taskは、非同期処理を始めるために使います。Taskの中では、awaitを使って非同期関数を呼ぶことができます。
-3.asyncの役割
-```func loadImage(from item: PhotosPickerItem?) async
+
+写真を選ぶと、`selectedItem`の値が変わります。
+
+`onChange`は、その変化を確認します。
+
+`Task`は、非同期処理を始めるために使います。
+
+`Task`の中では、`await`を使って非同期関数を呼ぶことができます。
+
+## 3. `async`の役割
+
+```swift
+func loadImage(from item: PhotosPickerItem?) async
 ```
-asyncは、この関数が非同期関数であることを表します。
+
+`async`は、この関数が非同期関数であることを表します。
+
 非同期関数では、時間がかかる処理の結果を待つことができます。
-4.awaitの役割
-```let data = try await item.loadTransferable(type: Data.self)
+
+## 4. `await`の役割
+
+```swift
+let data = try await item.loadTransferable(type: Data.self)
 ```
-loadTransferableは、選んだ写真をData型として読み込みます。
-awaitは、写真の読み込みが終わるまで待つために使います。
-読み込みが終わったら、DataをUIImageに変えて、画面に表示します。
-**最後の30秒：まとめ**
+
+`loadTransferable`は、選んだ写真を`Data`型として読み込みます。
+
+`await`は、写真の読み込みが終わるまで待つために使います。
+
+読み込みが終わったら、`Data`を`UIImage`に変えて、画面に表示します。
+
+## 5. 自分の実験
+
+写真を読み込む前に、2秒待つ処理を追加しました。
+
+```swift
+try? await Task.sleep(
+    nanoseconds: 2_000_000_000
+)
+```
+
+その結果、写真は約2秒後に表示されました。
+
+しかし、待っている間も、アプリの画面全体は止まりませんでした。
+
+この実験から、`await`は現在の非同期処理を一時的に待たせますが、アプリ全体を止めるものではないと分かりました。
+
+## 最後の30秒：まとめ
+
 最後にまとめます。
-Taskは、非同期処理を始めるために使います。
-asyncは、その関数が非同期関数であることを表します。
-awaitは、非同期処理の結果を待つために使います。
+
+- `Task`は、非同期処理を始めるために使います。
+- `async`は、その関数が非同期関数であることを表します。
+- `await`は、非同期処理の結果を待つために使います。
+
 この三つを使うことで、アプリの画面を止めずに写真を読み込めることが分かりました。
+
 以上で発表を終わります。ありがとうございました。
 
