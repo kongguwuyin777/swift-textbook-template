@@ -368,16 +368,25 @@ UIImagePickerControllerはUIKitのDelegate方式で動作するため、SwiftUI�
 この章では、フォトライブラリからの写真選択とカメラ撮影の実装方法を学んだ。
 特に、非同期処理とCoordinatorパターンによるSwiftUIとUIKitの連携が重要であることを理解した。
 
-##   発表テーマ
-写真の読み込みで使う非同期処理 ― Task・async・awaitの違い
-##  このテーマを選んだ理由
-写真の読み込みには時間がかかる場合があります。そこで、アプリの画面を止めずに処理する方法を理解したいと思い、このテーマを選びました。
+
+## 発表テーマ
+
+**写真の読み込みで使う非同期処理 ― `Task`・`async`・`await`の役割**
+
+## このテーマを選んだ理由
+
+写真の読み込みには、時間がかかる場合があります。
+
+そこで、アプリの画面を止めずに写真を読み込む方法を理解したいと思い、このテーマを選びました。
+
 ## 見せる箇所
+
 - 写真を選ぶアプリの画面
-- .onChangeとTask
-- loadImage関数
-- loadTransferableとawait
+- `.onChange`と`Task`
+- `loadImage`関数と`async`
+- `loadTransferable`と`await`
 - 自分の実験
+- SwiftとAndroidの違い
 
 ---
 
@@ -385,7 +394,11 @@ UIImagePickerControllerはUIKitのDelegate方式で動作するため、SwiftUI�
 
 ## 最初の30秒：テーマの紹介
 
-このアプリでは、フォトライブラリから写真を選んで画面に表示します。写真の読み込みには時間がかかる場合があるため、`Task`、`async`、`await`を使っています。
+私の発表テーマは、写真の読み込みで使う非同期処理です。
+
+このアプリでは、フォトライブラリから写真を選んで、画面に表示します。
+
+写真の読み込みには時間がかかる場合があるため、`Task`、`async`、`await`を使っています。
 
 ## 1. アプリの動作
 
@@ -393,7 +406,7 @@ UIImagePickerControllerはUIKitのDelegate方式で動作するため、SwiftUI�
 
 写真を選ぶと、その写真が画面に表示されます。
 
-写真を読み込む部分で、非同期処理が使われています。
+写真のデータを読み込む部分で、非同期処理が使われています。
 
 ## 2. `Task`の役割
 
@@ -407,11 +420,11 @@ UIImagePickerControllerはUIKitのDelegate方式で動作するため、SwiftUI�
 
 写真を選ぶと、`selectedItem`の値が変わります。
 
-`onChange`は、その変化を確認します。
+`.onChange`は、その変化を確認します。
 
-`Task`は、非同期処理を始めるために使います。
+`Task`は、新しい非同期処理を始めるために使います。
 
-`Task`の中では、`await`を使って非同期関数を呼ぶことができます。
+この`Task`の中から、`loadImage`という非同期関数を呼び出しています。
 
 ## 3. `async`の役割
 
@@ -421,7 +434,9 @@ func loadImage(from item: PhotosPickerItem?) async
 
 `async`は、この関数が非同期関数であることを表します。
 
-非同期関数では、時間がかかる処理の結果を待つことができます。
+非同期関数では、時間がかかる処理の完了を待つことができます。
+
+このコードでは、`loadImage`関数の中で写真のデータを読み込みます。
 
 ## 4. `await`の役割
 
@@ -431,9 +446,27 @@ let data = try await item.loadTransferable(type: Data.self)
 
 `loadTransferable`は、選んだ写真を`Data`型として読み込みます。
 
-`await`は、写真の読み込みが終わるまで待つために使います。
+`await`は、写真の読み込みが終わるまで、現在の非同期処理を一時的に待たせます。
 
-読み込みが終わったら、`Data`を`UIImage`に変えて、画面に表示します。
+写真の読み込みが終わると、`Data`を`UIImage`に変えます。
+
+```swift
+let uiImage = UIImage(data: data)
+```
+
+そのあと、SwiftUIの`Image`に変えて画面に表示します。
+
+```swift
+selectedImage = Image(uiImage: uiImage)
+```
+
+処理の流れは、次のとおりです。
+
+1. ユーザーが写真を選ぶ
+2. `.onChange`が変化を確認する
+3. `Task`が非同期処理を始める
+4. `await`で写真の読み込みを待つ
+5. 読み込んだ写真を画面に表示する
 
 ## 5. 自分の実験
 
@@ -445,12 +478,13 @@ try? await Task.sleep(
 )
 ```
 
-その結果、写真は約2秒後に表示されました。
+`2_000_000_000`ナノ秒は、2秒です。
 
-しかし、待っている間も、アプリの画面全体は止まりませんでした。
+実験の結果、写真は約2秒後に表示されました。
 
-この実験から、`await`は現在の非同期処理を一時的に待たせますが、アプリ全体を止めるものではないと分かりました。
+しかし、待っている間もアプリの画面全体は止まりませんでした。
 
+この実験から、`await`は現在の非同期処理を一時停止しますが、アプリ全体を止めるものではないと分かりました。
 
 ## 6. SwiftとAndroidの非同期処理の違い
 
@@ -466,7 +500,7 @@ func loadImage() async {
 }
 ```
 
-AndroidのKotlinでは、`launch`、`suspend fun`、`withContext`を使います。
+AndroidのKotlinでは、主に`launch`、`suspend fun`、`withContext`を使います。
 
 ```kotlin
 scope.launch {
@@ -485,19 +519,21 @@ suspend fun loadImage() {
 | Swift | Android（Kotlin） | 役割 |
 |---|---|---|
 | `Task` | `launch` | 非同期処理を始める |
-| `async` | `suspend fun` | 非同期関数を定義する |
-| `await` | 通常は書かない | 非同期処理の完了を待つ |
-| ― | `Dispatchers.IO` | 写真やファイルの読み込みを行う |
+| `async` | `suspend fun` | 待機できる関数を定義する |
+| `await` | 通常は特別な言葉を書かない | 非同期処理の完了を待つ |
+| 実行場所はシステムが管理する | `Dispatchers.IO`など | I/O処理を行う場所を指定する |
 
 Swiftの`Task`とKotlinの`launch`は、非同期処理を始めるために使います。
 
-Swiftの`async`に近いものは、Kotlinの`suspend fun`です。どちらも、時間がかかる処理を待つことができる関数を表します。
+Swiftの`async`に近いものは、Kotlinの`suspend fun`です。
 
-Swiftでは、非同期関数を呼ぶときに`await`を書きます。Kotlinでは、`suspend`関数を呼ぶときに、通常は`await`を書きません。
+Swiftでは、非同期関数を呼ぶときに`await`を書きます。
 
-また、Androidでは、写真やファイルを読み込む処理に`Dispatchers.IO`を使うことがあります。
+Kotlinでは、`suspend`関数を呼ぶときに、通常は`await`という言葉を書きません。
 
-書き方は少し違いますが、どちらもアプリの画面を止めずに、時間がかかる処理を行うために使います。
+Androidでは、写真やファイルの読み込みに`Dispatchers.IO`を使うことがあります。
+
+書き方は違いますが、時間がかかる処理で画面を止めないという目的は同じです。
 
 ## 最後の30秒：まとめ
 
@@ -505,9 +541,16 @@ Swiftでは、非同期関数を呼ぶときに`await`を書きます。Kotlin�
 
 - `Task`は、非同期処理を始めるために使います。
 - `async`は、その関数が非同期関数であることを表します。
-- `await`は、非同期処理の結果を待つために使います。
+- `await`は、非同期処理の完了を待つために使います。
 
-この三つを使うことで、アプリの画面を止めずに写真を読み込めることが分かりました。
+自分の実験では、2秒の待ち時間を追加しました。
 
-以上で発表を終わります。ありがとうございました。
+その結果、`await`は現在の非同期処理を待たせますが、アプリ全体は止めないことを確認できました。
+
+また、SwiftとAndroidでは書き方が違いますが、どちらも画面を止めずに時間がかかる処理を行うために使われます。
+
+以上で発表を終わります。
+
+ありがとうございました。
+
 
