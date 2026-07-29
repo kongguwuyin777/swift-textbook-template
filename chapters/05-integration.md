@@ -549,7 +549,6 @@ SwiftDataには Image や UIImage をそのまま保存できないため、保�
 |------|------|--------|
 | 例：`TabView` | 複数のビューをタブで切り替えるコンポーネント | `TabView { ... }.tabViewStyle(.page)` |
 | 例：`CLLocationManager` | GPS位置情報を取得するAPIManager | `let location = manager.location?.coordinate` |
-
 | `TabView` | 複数の画面をタブで切り替えるためのコンポーネント | `TabView { MapTab(); ListTab() }` |
 | `CLLocationManager` | GPSを使って現在地を取得するAPI | `manager.startUpdatingLocation()` |
 | `@Observable` | クラスの値の変化をSwiftUIの画面へ反映させる | `@Observable class LocationManager` |
